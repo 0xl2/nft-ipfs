@@ -5,68 +5,43 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract MyNFT is Ownable, ERC721URIStorage, ERC721Enumerable, ReentrancyGuard {
+contract MyNFT is Ownable, ERC721URIStorage, ReentrancyGuard {
     using Counters for Counters.Counter;
 
-    uint public MintPrice;
+    address public Minter;
 
     Counters.Counter private _tokenIds;
 
-    event PriceSet(uint price);
     event MintNFT(address indexed minter, uint tokenId);
+    event MinterSet(address indexed beforeAddr, address indexed afterAddr);
 
     constructor() 
-    ERC721("MyNFT", "MYNFT") {}
+    ERC721("MyNFT", "MYNFT") { }
 
-    function setMintPrice(uint _price) external onlyOwner {
-        require(_price > 0, "Invalid price");
-        MintPrice = _price;
+    function setMinter(address minter) external onlyOwner {
+        require(minter != address(0), "Invalid minter");
 
-        emit PriceSet(MintPrice);
+        emit MinterSet(Minter, minter);
+
+        Minter = minter;
     }
 
-    function mintNFT(string memory metaURI) external payable nonReentrant returns(uint tokenId) {
-        require(balanceOf(msg.sender) == 0, "Mint already");
-        require(msg.value >= MintPrice, "Insufficient balance");
+    function getTokenCount() external view returns(uint) {
+        return _tokenIds.current();
+    }
+
+    function mintNFT(address minter, string memory metaURI) external nonReentrant returns(uint tokenId) {
+        require(msg.sender == Minter, "Not authorized");
+        require(balanceOf(minter) == 0, "Mint already");
 
         _tokenIds.increment();
         tokenId = _tokenIds.current();
 
-        _mint(msg.sender, tokenId);
+        _mint(minter, tokenId);
         _setTokenURI(tokenId, metaURI);
 
-        emit MintNFT(msg.sender, tokenId);
-    }
-
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721, ERC721Enumerable)
-    {
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
-        super._burn(tokenId);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+        emit MintNFT(minter, tokenId);
     }
 
     function withdraw(address wallet) external onlyOwner {
