@@ -8,5 +8,9 @@ contracts are verified
 ```
 
 ```
+Minter Address:
+0xFC38390A8621c76c4e5e7b5451a844995086dAfa
 
+Minter private key:
+Please check api\config\config.json
 ```
