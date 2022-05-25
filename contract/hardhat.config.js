@@ -23,14 +23,8 @@ module.exports = {
   solidity: "0.8.4",
   defaultNetwork: 'fuji',
   networks: {
-    ganache: {
-      url: 'http://localhost:7545',
-      chainId: 1337,
-      accounts: [
-        config.p_key,
-        config.acc1,
-        config.acc2
-      ]
+    hardhat: {
+      chainId: 31337
     },
     fuji: {
       url: "https://speedy-nodes-nyc.moralis.io/1c8d8856c017266c637672dd/avalanche/testnet",
