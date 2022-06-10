@@ -31,17 +31,17 @@ contract MyNFT is Ownable, ERC721URIStorage, ReentrancyGuard {
         return _tokenIds.current();
     }
 
-    function mintNFT(address minter, string memory metaURI) external nonReentrant returns(uint tokenId) {
+    function mintNFT(address userAddress, string memory metaURI) external nonReentrant returns(uint tokenId) {
         require(msg.sender == Minter, "Not authorized");
-        require(balanceOf(minter) == 0, "Mint already");
+        require(balanceOf(userAddress) == 0, "Mint already");
 
         _tokenIds.increment();
         tokenId = _tokenIds.current();
 
-        _mint(minter, tokenId);
+        _mint(userAddress, tokenId);
         _setTokenURI(tokenId, metaURI);
 
-        emit MintNFT(minter, tokenId);
+        emit MintNFT(userAddress, tokenId);
     }
 
     function withdraw(address wallet) external onlyOwner {

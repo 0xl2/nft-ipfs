@@ -40,7 +40,7 @@ router.post('/nftmint', async(req, res) => {
 
     let metaData = "";
     if(fileName.indexOf('.txt') >= 0 && attachFile.mimetype == "text/plain") {
-      if(attachFile.size > 1024) return res.json({status: false, err_msg: "Size is bigger than 1KG" });
+      if(attachFile.size > 1024) return res.json({status: false, err_msg: "Size is bigger than 1KB" });
 
       metaData = attachFile.data.toString('utf8');
     } else if(attachFile.mimetype == "image/jpeg") {
@@ -58,7 +58,7 @@ router.post('/nftmint', async(req, res) => {
         return res.json({ status: true, data: Number(tokenId) });
       } catch(err1) {
         console.log(err1, "err1 here");
-        return res.json({ status: false, err_msg: err1.error.error.toString() });
+        return res.status(500).json({ status: false, err_msg: err1.error.error.toString() });
       }
     } else {
       return res.json({status: false, err_msg: "Invalid attached file"});
